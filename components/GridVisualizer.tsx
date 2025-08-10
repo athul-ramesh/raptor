@@ -52,9 +52,9 @@ export default function GridVisualizer() {
   };
 
   const isVisited = (r: number, c: number) =>
-    visited.some(([vr, vc]) => vr === r && vc === c);
+    visited.some((coord) => coord && coord[0] === r && coord[1] === c);
   const isPath = (r: number, c: number) =>
-    path.some(([pr, pc]) => pr === r && pc === c);
+    path.some((coord) => coord && coord[0] === r && coord[1] === c);
   const isStart = (r: number, c: number) => r === START[0] && c === START[1];
   const isEnd = (r: number, c: number) => r === end[0] && c === end[1];
   const isWall = (r: number, c: number) => walls.has(`${r},${c}`);
