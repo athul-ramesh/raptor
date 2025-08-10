@@ -45,7 +45,7 @@ export default function GridVisualizer() {
           DFS
         </button>
       </div>
-      <div className="grid grid-cols-5 gap-1">
+      <div className="grid grid-cols-5 gap-1 w-fit">
         {Array.from({ length: SIZE }).map((_, r) =>
           Array.from({ length: SIZE }).map((__, c) => (
             <div
