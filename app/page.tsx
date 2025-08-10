@@ -1,8 +1,10 @@
+import GridVisualizer from '../components/GridVisualizer';
 
 export default function Home() {
   return (
-    <div>
-      <h1>Welcome to the visualizer</h1>
-    </div>
+    <main className="p-8">
+      <h1 className="text-2xl font-bold mb-4">BFS & DFS Visualizer</h1>
+      <GridVisualizer />
+    </main>
   );
 }
