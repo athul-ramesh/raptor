@@ -3,26 +3,29 @@
 import { useState } from 'react';
 import { bfs, dfs, Coord } from '../lib/algorithms';
 
-const SIZE = 5;
+const SIZE = 10;
 const START: Coord = [0, 0];
 const END: Coord = [SIZE - 1, SIZE - 1];
 
 export default function GridVisualizer() {
   const [visited, setVisited] = useState<Coord[]>([]);
+  const [path, setPath] = useState<Coord[]>([]);
   const [running, setRunning] = useState(false);
 
   const run = (type: 'bfs' | 'dfs') => {
-    const order =
+    const { order, path: resultPath } =
       type === 'bfs'
         ? bfs(SIZE, SIZE, START, END)
         : dfs(SIZE, SIZE, START, END);
     setVisited([]);
+    setPath([]);
     setRunning(true);
     let i = 0;
     const interval = setInterval(() => {
       if (i >= order.length) {
         clearInterval(interval);
         setRunning(false);
+        setPath(resultPath);
         return;
       }
       setVisited((prev) => [...prev, order[i]]);
@@ -32,6 +35,8 @@ export default function GridVisualizer() {
 
   const isVisited = (r: number, c: number) =>
     visited.some(([vr, vc]) => vr === r && vc === c);
+  const isPath = (r: number, c: number) =>
+    path.some(([pr, pc]) => pr === r && pc === c);
   const isStart = (r: number, c: number) => r === START[0] && c === START[1];
   const isEnd = (r: number, c: number) => r === END[0] && c === END[1];
 
@@ -53,7 +58,7 @@ export default function GridVisualizer() {
           DFS
         </button>
       </div>
-      <div className="grid grid-cols-5 gap-1 w-fit">
+      <div className="grid grid-cols-10 gap-1 w-fit">
         {Array.from({ length: SIZE }).map((_, r) =>
           Array.from({ length: SIZE }).map((__, c) => (
             <div
@@ -63,6 +68,8 @@ export default function GridVisualizer() {
                   ? 'bg-green-300'
                   : isEnd(r, c)
                   ? 'bg-red-300'
+                  : isPath(r, c)
+                  ? 'bg-blue-300'
                   : isVisited(r, c)
                   ? 'bg-yellow-300'
                   : 'bg-white'

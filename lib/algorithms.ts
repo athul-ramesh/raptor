@@ -7,34 +7,58 @@ const directions: Coord[] = [
   [0, -1],
 ];
 
+export interface SearchResult {
+  order: Coord[];
+  path: Coord[];
+}
+
 export function bfs(
   rows: number,
   cols: number,
   start: Coord,
   end: Coord
-): Coord[] {
+): SearchResult {
   const visited: boolean[][] = Array.from({ length: rows }, () =>
     Array(cols).fill(false)
   );
+  const prev: (Coord | null)[][] = Array.from({ length: rows }, () =>
+    Array(cols).fill(null)
+  );
   const order: Coord[] = [];
   const queue: Coord[] = [start];
+  let found = false;
   visited[start[0]][start[1]] = true;
 
   while (queue.length) {
     const [r, c] = queue.shift()!;
     order.push([r, c]);
-    if (r === end[0] && c === end[1]) break;
+    if (r === end[0] && c === end[1]) {
+      found = true;
+      break;
+    }
     for (const [dr, dc] of directions) {
       const nr = r + dr;
       const nc = c + dc;
       if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && !visited[nr][nc]) {
         visited[nr][nc] = true;
+        prev[nr][nc] = [r, c];
         queue.push([nr, nc]);
       }
     }
   }
 
-  return order;
+  const path: Coord[] = [];
+  if (found) {
+    let curr: Coord | null = end;
+    while (curr) {
+      path.push(curr);
+      const p = prev[curr[0]][curr[1]];
+      curr = p;
+    }
+    path.reverse();
+  }
+
+  return { order, path };
 }
 
 export function dfs(
@@ -42,27 +66,27 @@ export function dfs(
   cols: number,
   start: Coord,
   end: Coord
-): Coord[] {
+): SearchResult {
   const visited: boolean[][] = Array.from({ length: rows }, () =>
     Array(cols).fill(false)
   );
   const order: Coord[] = [];
-  let found = false;
+  const path: Coord[] = [];
 
-  function walk(r: number, c: number) {
-    if (found) return;
-    if (r < 0 || r >= rows || c < 0 || c >= cols || visited[r][c]) return;
+  function walk(r: number, c: number): boolean {
+    if (r < 0 || r >= rows || c < 0 || c >= cols || visited[r][c])
+      return false;
     visited[r][c] = true;
     order.push([r, c]);
-    if (r === end[0] && c === end[1]) {
-      found = true;
-      return;
-    }
+    path.push([r, c]);
+    if (r === end[0] && c === end[1]) return true;
     for (const [dr, dc] of directions) {
-      walk(r + dr, c + dc);
+      if (walk(r + dr, c + dc)) return true;
     }
+    path.pop();
+    return false;
   }
 
   walk(start[0], start[1]);
-  return order;
+  return { order, path };
 }
