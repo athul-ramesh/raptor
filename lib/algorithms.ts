@@ -7,7 +7,12 @@ const directions: Coord[] = [
   [0, -1],
 ];
 
-export function bfs(rows: number, cols: number, start: Coord): Coord[] {
+export function bfs(
+  rows: number,
+  cols: number,
+  start: Coord,
+  end: Coord
+): Coord[] {
   const visited: boolean[][] = Array.from({ length: rows }, () =>
     Array(cols).fill(false)
   );
@@ -18,6 +23,7 @@ export function bfs(rows: number, cols: number, start: Coord): Coord[] {
   while (queue.length) {
     const [r, c] = queue.shift()!;
     order.push([r, c]);
+    if (r === end[0] && c === end[1]) break;
     for (const [dr, dc] of directions) {
       const nr = r + dr;
       const nc = c + dc;
@@ -31,16 +37,27 @@ export function bfs(rows: number, cols: number, start: Coord): Coord[] {
   return order;
 }
 
-export function dfs(rows: number, cols: number, start: Coord): Coord[] {
+export function dfs(
+  rows: number,
+  cols: number,
+  start: Coord,
+  end: Coord
+): Coord[] {
   const visited: boolean[][] = Array.from({ length: rows }, () =>
     Array(cols).fill(false)
   );
   const order: Coord[] = [];
+  let found = false;
 
   function walk(r: number, c: number) {
+    if (found) return;
     if (r < 0 || r >= rows || c < 0 || c >= cols || visited[r][c]) return;
     visited[r][c] = true;
     order.push([r, c]);
+    if (r === end[0] && c === end[1]) {
+      found = true;
+      return;
+    }
     for (const [dr, dc] of directions) {
       walk(r + dr, c + dc);
     }
