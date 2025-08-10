@@ -16,7 +16,8 @@ export function bfs(
   rows: number,
   cols: number,
   start: Coord,
-  end: Coord
+  end: Coord,
+  walls: Set<string> = new Set()
 ): SearchResult {
   const visited: boolean[][] = Array.from({ length: rows }, () =>
     Array(cols).fill(false)
@@ -39,7 +40,14 @@ export function bfs(
     for (const [dr, dc] of directions) {
       const nr = r + dr;
       const nc = c + dc;
-      if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && !visited[nr][nc]) {
+      if (
+        nr >= 0 &&
+        nr < rows &&
+        nc >= 0 &&
+        nc < cols &&
+        !visited[nr][nc] &&
+        !walls.has(`${nr},${nc}`)
+      ) {
         visited[nr][nc] = true;
         prev[nr][nc] = [r, c];
         queue.push([nr, nc]);
@@ -65,7 +73,8 @@ export function dfs(
   rows: number,
   cols: number,
   start: Coord,
-  end: Coord
+  end: Coord,
+  walls: Set<string> = new Set()
 ): SearchResult {
   const visited: boolean[][] = Array.from({ length: rows }, () =>
     Array(cols).fill(false)
@@ -74,7 +83,14 @@ export function dfs(
   const path: Coord[] = [];
 
   function walk(r: number, c: number): boolean {
-    if (r < 0 || r >= rows || c < 0 || c >= cols || visited[r][c])
+    if (
+      r < 0 ||
+      r >= rows ||
+      c < 0 ||
+      c >= cols ||
+      visited[r][c] ||
+      walls.has(`${r},${c}`)
+    )
       return false;
     visited[r][c] = true;
     order.push([r, c]);
