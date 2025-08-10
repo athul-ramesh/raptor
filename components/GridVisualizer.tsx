@@ -116,16 +116,16 @@ export default function GridVisualizer() {
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      <div className="bg-white p-4 rounded shadow flex flex-wrap items-center gap-2 justify-center">
+      <div className="w-full max-w-3xl rounded-2xl border border-black/10 dark:border-white/10 bg-white/60 dark:bg-white/5 p-4 sm:p-5 backdrop-blur shadow-md flex flex-wrap items-center gap-2 justify-center">
         <button
-          className="px-3 py-1 bg-blue-500 text-white rounded disabled:opacity-50"
+          className="px-4 py-2 rounded-full text-white disabled:opacity-50 bg-gradient-to-r from-indigo-600 to-violet-600 shadow hover:opacity-95 active:opacity-90 transition"
           onClick={() => run('bfs')}
           disabled={running}
         >
           BFS
         </button>
         <button
-          className="px-3 py-1 bg-green-500 text-white rounded disabled:opacity-50"
+          className="px-4 py-2 rounded-full text-white disabled:opacity-50 bg-gradient-to-r from-emerald-600 to-teal-600 shadow hover:opacity-95 active:opacity-90 transition"
           onClick={() => run('dfs')}
           disabled={running}
         >
@@ -138,7 +138,7 @@ export default function GridVisualizer() {
             min={2}
             value={rows}
             onChange={handleChangeRows}
-            className="w-16 border rounded px-1 py-0.5"
+            className="w-16 border border-black/10 dark:border-white/15 bg-white/70 dark:bg-white/10 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
             disabled={running}
           />
         </label>
@@ -149,7 +149,7 @@ export default function GridVisualizer() {
             min={2}
             value={cols}
             onChange={handleChangeCols}
-            className="w-16 border rounded px-1 py-0.5"
+            className="w-16 border border-black/10 dark:border-white/15 bg-white/70 dark:bg-white/10 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
             disabled={running}
           />
         </label>
@@ -158,7 +158,7 @@ export default function GridVisualizer() {
           <select
             value={speed}
             onChange={(e) => setSpeed(parseInt(e.target.value))}
-            className="border rounded px-1 py-0.5"
+            className="border border-black/10 dark:border-white/15 bg-white/70 dark:bg-white/10 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
             disabled={running}
           >
             <option value={100}>Fast</option>
@@ -167,15 +167,17 @@ export default function GridVisualizer() {
           </select>
         </label>
         <button
-          className="px-3 py-1 bg-gray-700 text-white rounded disabled:opacity-50"
+          className="px-4 py-2 rounded-full text-white disabled:opacity-50 bg-gray-800 hover:bg-gray-700 transition"
           onClick={addRandomWalls}
           disabled={running}
         >
           Random Walls
         </button>
         <button
-          className={`px-3 py-1 rounded text-white disabled:opacity-50 ${
-            placing === 'start' ? 'bg-purple-700' : 'bg-purple-500'
+          className={`px-4 py-2 rounded-full text-white disabled:opacity-50 transition ${
+            placing === 'start'
+              ? 'bg-purple-700'
+              : 'bg-purple-600 hover:bg-purple-500'
           }`}
           onClick={() => setPlacing('start')}
           disabled={running}
@@ -183,8 +185,8 @@ export default function GridVisualizer() {
           Set Start
         </button>
         <button
-          className={`px-3 py-1 rounded text-white disabled:opacity-50 ${
-            placing === 'end' ? 'bg-pink-700' : 'bg-pink-500'
+          className={`px-4 py-2 rounded-full text-white disabled:opacity-50 transition ${
+            placing === 'end' ? 'bg-pink-700' : 'bg-pink-600 hover:bg-pink-500'
           }`}
           onClick={() => setPlacing('end')}
           disabled={running}
@@ -194,7 +196,7 @@ export default function GridVisualizer() {
       </div>
 
       <div
-        className={`grid gap-1 w-fit`}
+        className={`grid gap-1.5 w-fit p-2 rounded-xl border border-black/5 dark:border-white/5 bg-white/50 dark:bg-white/5 backdrop-blur`}
         style={{ gridTemplateColumns: `repeat(${cols}, 2.5rem)` }}
       >
         {Array.from({ length: rows }).map((_, r) =>
@@ -202,18 +204,18 @@ export default function GridVisualizer() {
             <div
               key={`${r}-${c}`}
               onClick={() => handleCellClick(r, c)}
-              className={`h-10 w-10 border ${
+              className={`h-10 w-10 rounded-md border border-black/10 dark:border-white/10 transition-colors ${
                 isStart(r, c)
-                  ? 'bg-green-300'
+                  ? 'bg-green-400/80'
                   : isEnd(r, c)
-                  ? 'bg-red-300'
+                  ? 'bg-rose-400/80'
                   : isWall(r, c)
-                  ? 'bg-gray-500'
+                  ? 'bg-gray-700/80 dark:bg-gray-600/80'
                   : isPath(r, c)
-                  ? 'bg-blue-300'
+                  ? 'bg-blue-400/80'
                   : isVisited(r, c)
-                  ? 'bg-yellow-300'
-                  : 'bg-white'
+                  ? 'bg-yellow-300/80'
+                  : 'bg-white/70 dark:bg-white/10'
               }`}
             />
           ))
@@ -222,4 +224,3 @@ export default function GridVisualizer() {
     </div>
   );
 }
-
