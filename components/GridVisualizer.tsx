@@ -1,26 +1,29 @@
 'use client';
 
-import { useState, ChangeEvent } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 import { bfs, dfs, Coord } from '../lib/algorithms';
-
-const START: Coord = [0, 0];
 
 export default function GridVisualizer() {
   const [rows, setRows] = useState(10);
   const [cols, setCols] = useState(10);
+  const [start, setStart] = useState<Coord>([0, 0]);
+  const [end, setEnd] = useState<Coord>([rows - 1, cols - 1]);
   const [speed, setSpeed] = useState(300);
   const [walls, setWalls] = useState<Set<string>>(new Set());
   const [visited, setVisited] = useState<Coord[]>([]);
   const [path, setPath] = useState<Coord[]>([]);
   const [running, setRunning] = useState(false);
+  const [placing, setPlacing] = useState<'start' | 'end' | null>(null);
 
-  const end: Coord = [rows - 1, cols - 1];
+  useEffect(() => {
+    setEnd([rows - 1, cols - 1]);
+  }, [rows, cols]);
 
   const run = (type: 'bfs' | 'dfs') => {
     const { order, path: resultPath } =
       type === 'bfs'
-        ? bfs(rows, cols, START, end, walls)
-        : dfs(rows, cols, START, end, walls);
+        ? bfs(rows, cols, start, end, walls)
+        : dfs(rows, cols, start, end, walls);
     setVisited([]);
     setPath([]);
     setRunning(true);
@@ -41,7 +44,7 @@ export default function GridVisualizer() {
     const newWalls = new Set<string>();
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        if ((r === START[0] && c === START[1]) || (r === end[0] && c === end[1]))
+        if ((r === start[0] && c === start[1]) || (r === end[0] && c === end[1]))
           continue;
         if (Math.random() < 0.3) newWalls.add(`${r},${c}`);
       }
@@ -55,9 +58,45 @@ export default function GridVisualizer() {
     visited.some((coord) => coord && coord[0] === r && coord[1] === c);
   const isPath = (r: number, c: number) =>
     path.some((coord) => coord && coord[0] === r && coord[1] === c);
-  const isStart = (r: number, c: number) => r === START[0] && c === START[1];
+  const isStart = (r: number, c: number) => r === start[0] && c === start[1];
   const isEnd = (r: number, c: number) => r === end[0] && c === end[1];
   const isWall = (r: number, c: number) => walls.has(`${r},${c}`);
+
+  const handleCellClick = (r: number, c: number) => {
+    if (running) return;
+    const key = `${r},${c}`;
+    if (placing === 'start') {
+      if (!isEnd(r, c)) {
+        setStart([r, c]);
+        setWalls((prev) => {
+          const nw = new Set(prev);
+          nw.delete(key);
+          return nw;
+        });
+      }
+      setPlacing(null);
+    } else if (placing === 'end') {
+      if (!isStart(r, c)) {
+        setEnd([r, c]);
+        setWalls((prev) => {
+          const nw = new Set(prev);
+          nw.delete(key);
+          return nw;
+        });
+      }
+      setPlacing(null);
+    } else {
+      if (isStart(r, c) || isEnd(r, c)) return;
+      setWalls((prev) => {
+        const nw = new Set(prev);
+        if (nw.has(key)) nw.delete(key);
+        else nw.add(key);
+        return nw;
+      });
+    }
+    setVisited([]);
+    setPath([]);
+  };
 
   const handleChangeRows = (e: ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value) || 1;
@@ -134,6 +173,24 @@ export default function GridVisualizer() {
         >
           Random Walls
         </button>
+        <button
+          className={`px-3 py-1 rounded text-white disabled:opacity-50 ${
+            placing === 'start' ? 'bg-purple-700' : 'bg-purple-500'
+          }`}
+          onClick={() => setPlacing('start')}
+          disabled={running}
+        >
+          Set Start
+        </button>
+        <button
+          className={`px-3 py-1 rounded text-white disabled:opacity-50 ${
+            placing === 'end' ? 'bg-pink-700' : 'bg-pink-500'
+          }`}
+          onClick={() => setPlacing('end')}
+          disabled={running}
+        >
+          Set End
+        </button>
       </div>
 
       <div
@@ -144,6 +201,7 @@ export default function GridVisualizer() {
           Array.from({ length: cols }).map((__, c) => (
             <div
               key={`${r}-${c}`}
+              onClick={() => handleCellClick(r, c)}
               className={`h-10 w-10 border ${
                 isStart(r, c)
                   ? 'bg-green-300'
