@@ -54,6 +54,15 @@ export default function GridVisualizer() {
     setPath([]);
   };
 
+  const resetGrid = () => {
+    setWalls(new Set());
+    setVisited([]);
+    setPath([]);
+    setStart([0, 0]);
+    setEnd([rows - 1, cols - 1]);
+    setPlacing(null);
+  };
+
   const isVisited = (r: number, c: number) =>
     visited.some((coord) => coord && coord[0] === r && coord[1] === c);
   const isPath = (r: number, c: number) =>
@@ -172,6 +181,13 @@ export default function GridVisualizer() {
           disabled={running}
         >
           Random Walls
+        </button>
+        <button
+          className="px-4 py-2 rounded-full text-white disabled:opacity-50 bg-red-600 hover:bg-red-500 transition"
+          onClick={resetGrid}
+          disabled={running}
+        >
+          Reset
         </button>
         <button
           className={`px-4 py-2 rounded-full text-white disabled:opacity-50 transition ${
